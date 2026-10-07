@@ -1,0 +1,48 @@
+{
+  "description": "Reference definition of the two Activator rules. Recreate them in the Activator UI (see README step 5). Values in <> come from scripts/setup-spn.ps1.",
+  "object": {
+    "name": "Capacity",
+    "source": "Fabric capacity overview events (Microsoft.Fabric.Capacity.Summary)",
+    "keyColumn": "data.capacityName"
+  },
+  "rules": [
+    {
+      "name": "Scale UP capacity",
+      "property": "data.interactiveDelayThresholdPercentage",
+      "condition": { "type": "IsGreaterThan", "value": 80, "sustainedFor": "10 minutes" },
+      "action": {
+        "type": "Run Fabric item -> User data function",
+        "item": "<UDF item name>",
+        "function": "scale_fabric_capacity",
+        "parameters": {
+          "subscription_id": "<subscription-id>",
+          "resource_group": "<resource-group>",
+          "capacity_name": "<capacity-name>",
+          "direction": "up",
+          "tenant_id": "<tenant-id>",
+          "client_id": "<client-id>",
+          "client_secret": "<client-secret>"
+        }
+      }
+    },
+    {
+      "name": "Scale DOWN capacity",
+      "property": "data.interactiveRejectionThresholdPercentage",
+      "condition": { "type": "IsLessThan", "value": 30, "sustainedFor": "60 minutes" },
+      "action": {
+        "type": "Run Fabric item -> User data function",
+        "item": "<UDF item name>",
+        "function": "scale_fabric_capacity",
+        "parameters": {
+          "subscription_id": "<subscription-id>",
+          "resource_group": "<resource-group>",
+          "capacity_name": "<capacity-name>",
+          "direction": "down",
+          "tenant_id": "<tenant-id>",
+          "client_id": "<client-id>",
+          "client_secret": "<client-secret>"
+        }
+      }
+    }
+  ]
+}
